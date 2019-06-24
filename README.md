@@ -76,7 +76,6 @@ License: MIT
 Encoding: UTF-8
 LazyData: true
 ```
-
 We also need to update `NAMESPACE` to tell our package how to access the functions we need from the `stringr` package. Thankfully, it's a simple one-liner:
 
 ```R
