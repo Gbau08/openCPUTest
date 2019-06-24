@@ -1,5 +1,7 @@
 # So, you want to build a REST API with R...
 
+Credit to https://github.com/cw25/opencpu_service_ci_tutorial
+
 I recently found myself stuck. I had a slick bit of R code that I was using to generate some valuable stats,
 but I had no way to get it into production. The app stack where I work is mostly LAMP, and honestly, anybody
 who says they want to do statistical computing in PHP should seek medical attention.
@@ -376,5 +378,4 @@ Many thanks to:
 * Jeroen Ooms, for saving me so much time/effort with his hard work on OpenCPU
 * The R community for their constant willingness to help
 * You, for reading this
-
-I'd love to hear your thoughts on this tutorial! You can find me on Twitter at [@iamchriswalker](https://twitter.com/iamchriswalker) or email me at [cwalker@illuminateed.com](mailto:cwalker@illuminateed.com)
+* CW 25 https://github.com/cw25/opencpu_service_ci_tutorial
