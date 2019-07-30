@@ -1,1 +1,3 @@
-install.packages(c('stringr'), repos='http://cran.us.r-project.org', dependencies=TRUE)
+install.packages(c('data.table','devtools','ddpcr','foreach','doParallel'), repos='http://cran.us.r-project.org')
+library(devtools)
+install_github("phenoscanner/phenoscanner")

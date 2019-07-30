@@ -2,32 +2,8 @@
 
 Credit to https://github.com/cw25/opencpu_service_ci_tutorial
 
-I recently found myself stuck. I had a slick bit of R code that I was using to generate some valuable stats,
-but I had no way to get it into production. The app stack where I work is mostly LAMP, and honestly, anybody
-who says they want to do statistical computing in PHP should seek medical attention.
-
-In order to properly develop and deploy my service with continuous integration, I needed to be able to
-answer all the usual questions:
-
-+ Can I package up my R code to run in other environments?
-+ Can I run unit tests against my code?
-+ Can I easily wrap my code in a REST API?
-+ Can I bundle everything together into a production-ready container?
-+ Can I automate the testing of that container before it goes into production?
-
-Luckily, we have all the pieces we need!
-
-+ [R](https://www.r-project.org/) and its [packaging system](http://r-pkgs.had.co.nz/) help with portability
-+ The [testthat](http://r-pkgs.had.co.nz/tests.html) package allows us to test our R code
-+ The amazing [OpenCPU](https://www.opencpu.org) project gives us an easy way to wrap R code with an API
-+ OpenCPU also has [Docker](https://www.docker.com/) support so we can containerize our service
-+ [Travis CI](https://travis-ci.com/) provides easy tools for automated testing of our Docker container
-
-
-
 # First, an anatomy lesson
 
-This Git repo can serve as a template for the layout of your project. This is the same file layout I've used for building my services at [Illuminate Education](https://www.illuminateed.com). It is organized as an R package, with a few add-ons for Docker and OpenCPU. Here's a quick rundown of what the various files and directories do:
 
 * `R/`: Your R code goes in this directory
 * `docker/installer.R`: Used to install any R dependencies your code might have. This will take the place of `library()` calls in your R code
@@ -42,7 +18,6 @@ This Git repo can serve as a template for the layout of your project. This is th
 * `LICENSE`: Legal things that people rarely read
 * `NAMESPACE`: R package instructions for importing other libraries and exporting your own functions
 * `README.md`: Bad jokes and explanatory gymnastics
-
 
 
 # R Code
@@ -84,83 +59,6 @@ import(stringr)
 
 We have a bare bones R package now. Now let's look at how we can write and run tests to ensure that our package does what we expect it to do.
 
-
-
-# testthat
-
-Testing is easy in R, thanks to `testthat`. First, we create the master file (`tests/testthat.R`) that will trigger all of our tests.
-
-
-```R
-library(testthat)
-library(stringstats)
-
-test_check("stringstats")
-```
-
-Then, in the `tests/testthat/` directory, we can have as many tests as we need, split into as many files as we need. We just need to name them so they start with `test_` and end with `.R`. Let's create `tests/testthat/test_getMeanWordLength.R` to test the function we wrote.
-
-```R
-context("getMeanWordLength")
-
-test_that("Mean word length is computed correctly", {
-    text = "Do you want the mustache on or off"
-    expect_equal(getMeanWordLength(text), 3.376)
-})
-```
-
-The actual mean word length of our test string is 3.375, but this gives us an opportunity to see a test fail, and to look at a few helpful tips that will make development go more smoothly. From the project's root directory, we can test our project with the `R CMD CHECK .` command. This will trigger a build of our package (like Docker would do in production) and run our tests.
-
-Here is the output from the testing portion of our build:
-
-
-```
-* checking tests ...
-  Running ‘testthat.R’
- ERROR
-Running the tests in ‘tests/testthat.R’ failed.
-Last 13 lines of output:
-  Loading required package: stringr
-  > 
-  > test_check("stringstats")
-  1. Failure: Mean word length is computed correctly (@test_getMeanWordLength.R#5) 
-  getMeanWordLength(text) not equal to 3.376.
-  1/1 mismatches
-  [1] 3.38 - 3.38 == -0.001
-  
-  
-  testthat results ================================================================
-  OK: 0 SKIPPED: 0 FAILED: 1
-  1. Failure: Mean word length is computed correctly (@test_getMeanWordLength.R#5) 
-  
-  Error: testthat unit tests failed
-  Execution halted
-* checking PDF version of manual ... OK
-* DONE
-
-Status: 1 ERROR, 2 WARNINGs, 2 NOTEs
-```
-
-R produces _a lot_ of output when you build a package. Sometimes your test output scrolls away in the stdout flood, or helpful test output gets truncated. If you want to view the full results of your tests, R captures all test output in `..Rcheck/tests/testthat.Rout.fail` when your tests fail, and `..Rcheck/tests/testthat.Rout` when they succeed. If your build breaks, and R is complaining, the `..Rcheck` directory is a good place to start looking for answers.
-
-Once our test is fixed, the end of the check looks like this instead:
-
-```
-* checking tests ...
-  Running ‘testthat.R’
- OK
-* checking PDF version of manual ... OK
-* DONE
-
-Status: 2 WARNINGs, 2 NOTEs
-See
-  ‘/Users/cwalker/Documents/Illuminate/Data Science/R Libraries/opencpu_service_ci_tutorial/..Rcheck/00check.log’
-for details.
-```
-
-No more errors. Now we are ready to wrap our function in an API.
-
-
 # OpenCPU
 
 Docker is going to do most of the heavy lifting for us where OpenCPU is concerned. All we need to worry about is how to configure the OpenCPU server. OpenCPU generally works very well out of the box, but I'll share two things that I've found useful. (Both are optional, so you can skip them if you like.)
@@ -189,10 +87,6 @@ Our R code would then be able to access those environment variables using calls 
 
 
 # Docker
-
-I don't know about you, but I'm not too fond of setting up new server hardware. Rather than dedicate an entire production server to running OpenCPU, and doing all the hard work of installing and configuring it, OpenCPU provides an official `Dockerfile` to do it for us.
-
-If you're not familiar with Docker, you can think of a Docker container as a stripped down virtual machine, containing only the bare minimum components necessary to run your service. Containerizing your service gives you some amazing advantages like tracking your server configuration changes via version control, fast spin-up of services, efficient auto-scaling of your services, etc.
 
 We will need to setup two Docker-related files in order to build a Docker _image_ of our service. Once the image is built, we will spin up a container with our image and see OpenCPU in action. Let's start with our `Dockerfile`:
 
@@ -225,8 +119,6 @@ install.packages(c('stringr'), repos='http://cran.us.r-project.org', dependencie
 ```
 
 If we wanted to install multiple CRAN packages, we would simply add them to our `install.packages()` call. We might also use `devtools::install_github()` to install R packages hosted on Github.
-
-Let's build our Docker image! From inside the project directory, run the command `docker build -t stringstats .` and watch Docker do its magic. 
 
 ```
 $ docker build -t stringstats .

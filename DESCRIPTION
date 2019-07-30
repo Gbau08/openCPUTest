@@ -1,13 +1,11 @@
-Package: stringstats
-Title: String Statistics API
+Package: dummyOpenTargetData
+Title: dummyDataOpenTarget
 Version: 1.0
-Date: 2017-08-30
-Authors@R: person("Christopher", "Walker", email = "cw25@me.com", role = c("aut", "cre"))
-Author: Christopher Walker [aut, cre]
-Maintainer: Christopher Walker <cw25@me.com>
-Description: API for calculating simple statistics about text strings.
-Depends: stringr
-Suggests: testthat
+Date: 2019-07-23
+Authors@R: person("Bausier", "Guillaume", email = "guillaume.bausier@ucb.com", role = c("aut", "cre"))
+Author: Guillaume Bausier [aut, cre]
+Description: API for returning dummy Data.
 License: MIT
+Depends : data.table,phenoscanner,ddpcr,foreach,doParallel
 Encoding: UTF-8
 LazyData: true

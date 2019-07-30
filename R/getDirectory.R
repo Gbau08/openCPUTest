@@ -1,0 +1,4 @@
+getDirectory <- function() {
+
+  print(getwd())
+}

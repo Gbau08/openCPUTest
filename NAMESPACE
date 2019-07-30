@@ -1,1 +1,11 @@
-import(stringr)
+import(data.table)
+import(phenoscanner)
+import(ddpcr)
+import(foreach)
+import(doParallel)
+
+export(getDirectory)
+export(changeDirectory)
+export(getHighestScore)
+export(getRsidDummyData)
+export(getPhenoScannerData)
